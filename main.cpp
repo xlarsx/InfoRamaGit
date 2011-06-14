@@ -1,12 +1,12 @@
 #include <QtCore/QCoreApplication>
-#include <QDebug>
 #include <QDir>
+#include <QTextStream>
 #include <iostream>
 
-#define DEBUG
+//#define DEBUG
 
 QString obtenInfoArchivo(QString archivo);
-QString obtenSHA1DeHEAD(QString texto, QDir * directorio);
+QString obtenSHA1DeHEAD(QString texto, QDir * directorio, QString &branch);
 
 int main(int argc, char *argv[])
 {
@@ -22,8 +22,10 @@ int main(int argc, char *argv[])
         if(directorio.exists("HEAD"))
         {
             QString dirArchivoHEAD = directorio.absoluteFilePath("HEAD");
+            QString branch = "";
+            QString SHA1 = obtenSHA1DeHEAD(obtenInfoArchivo(dirArchivoHEAD), &directorio, branch);
 
-            qDebug() << obtenSHA1DeHEAD(obtenInfoArchivo(dirArchivoHEAD), &directorio);
+            std::cout << branch.toLatin1().data() << SHA1.toLatin1().data();
         }
     }
 
@@ -48,7 +50,7 @@ QString obtenInfoArchivo(QString archivo)
     return salida;
 }
 
-QString obtenSHA1DeHEAD(QString texto, QDir * directorio)
+QString obtenSHA1DeHEAD(QString texto, QDir * directorio, QString &branch)
 {
     if(texto.contains("ref:"))
     {
@@ -56,8 +58,11 @@ QString obtenSHA1DeHEAD(QString texto, QDir * directorio)
         if(lista.size() > 1)
         {
             QString ref = lista[1];
-            return obtenSHA1DeHEAD(obtenInfoArchivo(directorio->absoluteFilePath(ref)), directorio);
+            QString archivoALeer = directorio->absoluteFilePath(ref);
+            QDir dirInteres(archivoALeer);
+            branch.append(dirInteres.dirName() + "\n");
+            return obtenSHA1DeHEAD(obtenInfoArchivo(archivoALeer), directorio, branch);
         }
-    } else
-        return texto;
+    }
+    return texto;
 }
