@@ -3,19 +3,13 @@
 #include <QTextStream>
 #include <iostream>
 
-//#define DEBUG
-
 QString obtenInfoArchivo(QString archivo);
 QString obtenSHA1DeHEAD(QString texto, QDir * directorio, QString &branch);
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-#ifdef DEBUG
-    QDir directorio("D://LARS//Proyectos//iClimaLaboral2011//Desarrollo//iClimaLaboral//iClimaLaboral");
-#else
     QDir directorio = QDir(QDir::currentPath());
-#endif
 
     if(directorio.cd(".git"))
     {
